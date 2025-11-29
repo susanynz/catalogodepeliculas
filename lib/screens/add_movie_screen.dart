@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/movie.dart';
 
@@ -21,7 +22,7 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   void _saveMovie() {
     if (_formKey.currentState!.validate()) {
       final movie = Movie(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: '',
         title: _titleController.text,
         year: int.tryParse(_yearController.text) ?? 0,
         director: _directorController.text,
@@ -30,8 +31,15 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
         imageUrl: _imageUrlController.text,
       );
 
-      // 👇 Clave: REGRESAMOS la película a la pantalla anterior
-      Navigator.pop(context, movie);
+      FirebaseFirestore.instance
+          .collection('movies')
+          .add(movie.toMap())
+          .then((_) => Navigator.pop(context))
+          .catchError((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al guardar la película')),
+        );
+      });
     }
   }
 

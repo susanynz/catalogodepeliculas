@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/movie.dart';
 import 'details_screen.dart';
@@ -12,18 +13,13 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   Future<void> _goToAdmin() async {
-    // Esperamos a que se cierre la pantalla de administración
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => const AdminScreen(),
       ),
     );
-
-    // Cuando regresa, forzamos que se reconstruya el catálogo
-    setState(() {
-      // No hace falta cambiar nada aquí, solo disparar el rebuild
-    });
+    setState(() {}); // refresca al volver
   }
 
   @override
@@ -38,25 +34,47 @@ class _CatalogScreenState extends State<CatalogScreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: dummyMovies.length,
-        itemBuilder: (context, index) {
-          final movie = dummyMovies[index];
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('movies')
+            .orderBy('title')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error al cargar películas'));
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-          return ListTile(
-            leading: Image.network(
-              movie.imageUrl,
-              width: 60,
-              fit: BoxFit.cover,
-            ),
-            title: Text(movie.title),
-            subtitle: Text("${movie.year} • ${movie.genre}"),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => DetailsScreen(movie: movie),
-                ),
+          final docs = snapshot.data!.docs;
+          if (docs.isEmpty) {
+            return const Center(child: Text('No hay películas en el catálogo.'));
+          }
+
+          return ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              final movie = Movie.fromDoc(docs[index]);
+
+              return ListTile(
+                leading: movie.imageUrl.isNotEmpty
+                    ? Image.network(
+                        movie.imageUrl,
+                        width: 60,
+                        fit: BoxFit.cover,
+                      )
+                    : const Icon(Icons.movie),
+                title: Text(movie.title),
+                subtitle: Text("${movie.year} • ${movie.genre}"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DetailsScreen(movie: movie),
+                    ),
+                  );
+                },
               );
             },
           );

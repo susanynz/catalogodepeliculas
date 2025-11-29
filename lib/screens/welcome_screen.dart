@@ -45,7 +45,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
-            // Botón Registrarse (por ahora lo mandamos al mismo login)
+            // Botón "Registrarse"
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -63,7 +63,7 @@ class WelcomeScreen extends StatelessWidget {
 
             const SizedBox(height: 15),
 
-            // Botón Iniciar sesión
+            // Botón "Iniciar sesión"
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(

@@ -10,15 +10,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      // Aquí podrías validar usuario/contraseña reales
-      // Por ahora: si todo está lleno, entra al catálogo
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

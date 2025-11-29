@@ -17,13 +17,14 @@ class DetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Image.network(
-                movie.imageUrl,
-                height: 250,
-                fit: BoxFit.cover,
+            if (movie.imageUrl.isNotEmpty)
+              Center(
+                child: Image.network(
+                  movie.imageUrl,
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
             const SizedBox(height: 16),
             Text(
               movie.title,

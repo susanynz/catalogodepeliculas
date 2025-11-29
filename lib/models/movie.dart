@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Movie {
   final String id;
   final String title;
@@ -16,29 +18,30 @@ class Movie {
     required this.synopsis,
     required this.imageUrl,
   });
-}
 
-final List<Movie> dummyMovies = [
-  Movie(
-    id: 'm1',
-    title: 'The Matrix',
-    year: 1999,
-    director: 'The Wachowskis',
-    genre: 'Ciencia ficción',
-    synopsis:
-        'Un hacker descubre la verdadera naturaleza de su realidad y su papel en la guerra contra sus controladores.',
-    imageUrl:
-        'https://m.media-amazon.com/images/I/51EG732BV3L._AC_.jpg',
-  ),
-  Movie(
-    id: 'm2',
-    title: 'Inception',
-    year: 2010,
-    director: 'Christopher Nolan',
-    genre: 'Ciencia ficción',
-    synopsis:
-        'Un ladrón que roba secretos a través de los sueños recibe la misión de implantar una idea en la mente de un objetivo.',
-    imageUrl:
-        'https://m.media-amazon.com/images/I/51v5ZpFyaFL._AC_.jpg',
-  ),
-];
+  factory Movie.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Movie(
+      id: doc.id,
+      title: data['title'] ?? '',
+      year: (data['year'] ?? 0) is int
+          ? data['year']
+          : int.tryParse(data['year'].toString()) ?? 0,
+      director: data['director'] ?? '',
+      genre: data['genre'] ?? '',
+      synopsis: data['synopsis'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'year': year,
+      'director': director,
+      'genre': genre,
+      'synopsis': synopsis,
+      'imageUrl': imageUrl,
+    };
+  }
+}
